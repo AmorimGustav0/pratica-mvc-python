@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css')}}">
+</head>
+
+<body>
+    <div id="a">
+    <h1>Lista de Tarefas</h1>
+    <div class="agenda">
+        <input id="tarefa" type="text"></input>
+        <input type="date" id="date"></input>
+        <button onclick="adicionarTarefa()">Adicionar Tarefa</button>
+    </div>  
+
+    <p id="exibir"></p>
+    <div id="lista-de-tarefas"></div>
+
+    <script>
+        let afazeres;
+        let afazeressalvos = JSON.parse(localStorage.getItem("afazeres"));
+            if(Array.isArray( afazeressalvos )){
+                afazeres = afazeressalvos;
+            }
+            else {
+                afazeres = [
+
+                ]
+            }
+       
+
+        function salvartarefas(){
+            localStorage.setItem("afazeres", JSON.stringify(afazeres));
+            console.log(JSON.stringify(afazeres))
+        }
+ 
+        function adicionarTarefa() {
+            const caixaDeTexto = document.getElementById("tarefa");
+            const caixadate = document.getElementById("date");
+            const tarefa = caixaDeTexto.value;
+            const date = caixadate.value;
+            afazeres.push(
+                {
+                    nome: tarefa,
+                    data: date,
+                    id: Date.now()
+                }
+            );
+                
+            salvartarefas();
+            renderizar();
+           
+        }
+ 
+        function renderizar(tarefa){
+ 
+            document.getElementById("lista-de-tarefas").innerHTML = ""
+ 
+ 
+            afazeres.forEach(function(tarefa){
+               
+                const elemento = document.createElement("div");
+                const dataFormatada = new Date(tarefa.data).toLocaleDateString('pt-BR');
+                elemento.innerHTML = tarefa.nome + " " + dataFormatada
+ 
+                const botao = document.createElement("button")
+                botao.innerText = "Apagar"
+                botao.style = "margin-left: 12px"
+                botao.id = tarefa.id;
+                botao.onclick = removerTarefa;
+                elemento.appendChild(botao)
+ 
+                const listaDeTarefas = document.getElementById("lista-de-tarefas");
+                listaDeTarefas.appendChild(elemento)
+            })  
+           
+        }
+ 
+        function removerTarefa(evento){
+            const botao = evento.target
+            const id = botao.id
+            afazeres = afazeres.filter(function(tarefa){
+                            if(tarefa.id == id){
+                                return false;
+                            }
+                            else{
+                                return true;
+                            }
+                        }
+            );
+            salvartarefas();
+            renderizar();
+        }
+        renderizar()
+    </script>
+
+</div>
+</body>
